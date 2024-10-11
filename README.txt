@@ -99,6 +99,14 @@ DISPLAY=:0.0 gst-launch-1.0 nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=
 
 DISPLAY=:0.0 gst-launch-1.0 nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=640, height=480, format=(string)RGB, framerate=(fraction)60/1' ! nvoverlaysink -e
 
+
+	# from Dione IR documentation
+DISPLAY=:0.0 gst-launch-1.0 v4l2src device=/dev/video0 ! video/x-raw,formAt=BGRA,width=640,height=480 ! videoconvert ! video/x-raw,format=NV12 ! nvvidconv ! nvoverlaysink sync=false
+
+	# Lattice Crosslink FPGA as IMX219 - works
+DISPLAY=:0.0 gst-launch-1.0 nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=3280, height=2464, format=(string)NV12, framerate=(fraction)20/1' ! nvoverlaysink -e
+DISPLAY=:0.0 gst-launch-1.0 nvarguscamerasrc ! 'video/x-raw(memory:NVMM), width=640, height=480, format=(string)NV12, framerate=(fraction)120/1' ! nvoverlaysink -e
+
 --------------------------------------------
 
 apt-get install v4l-utils
@@ -108,11 +116,100 @@ v4l2-ctl --list-formats-ext
 
 v4l2-ctl --all --device /dev/video0
 
+v4l2-compliance -d /dev/video0
+
+v4l2-ctl -V -d /dev/video0
+
 v4l2-ctl --stream-mmap --stream-to=file.raw --stream-count=1
 v4l2-ctl --device /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=RGBA --stream-mmap --stream-to=file.raw --stream-count=1
+
+
+v4l2-ctl --set-fmt-video=width=3280,height=2464,pixelformat=AR24 --stream-mmap --stream-count=1 -d /dev/video0 --stream-to=image.raw
+https://github.com/xenicsir/dione_mipi_tegra/tree/main/jetpack
+
 --------------------------------------------
 
 PCO
 IP: 192.168.3.12
 Gateway: 192.168.3.10
 DNS: 10.0.2.10
+
+
+
+
+
+
+-------------------- log IMX477 - works ok ------------------------
+$$$$
+
+-------------------- log crosslink imx219 imitation - not works ------------------------
+Setting pipeline to PAUSED ...
+Pipeline is live and does not need PREROLL ...
+Setting pipeline to PLAYING ...
+New clock: GstSystemClock
+GST_ARGUS: Creating output stream
+CONSUMER: Waiting until producer is connected...
+GST_ARGUS: Available Sensor modes :
+GST_ARGUS: 3264 x 2464 FR = 21,000000 fps Duration = 47619048 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 3264 x 1848 FR = 28,000001 fps Duration = 35714284 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 1920 x 1080 FR = 29,999999 fps Duration = 33333334 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 1640 x 1232 FR = 29,999999 fps Duration = 33333334 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 1280 x 720 FR = 59,999999 fps Duration = 16666667 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 1280 x 720 FR = 120,000005 fps Duration = 8333333 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: Running with following settings:
+   Camera index = 0 
+   Camera mode  = 0 
+   Output Stream W = 3264 H = 2464 
+   seconds to Run    = 0 
+   Frame Rate = 21,000000 
+GST_ARGUS: Setup Complete, Starting captures for 0 seconds
+GST_ARGUS: Starting repeat capture requests.
+CONSUMER: Producer has connected; continuing.
+nvbuf_utils: dmabuf_fd -1 mapped entry NOT found
+nvbuf_utils: Can not get HW buffer from FD... Exiting...
+CONSUMER: ERROR OCCURRED
+ERROR: from element /GstPipeline:pipeline0/GstNvArgusCameraSrc:nvarguscamerasrc0: CANCELLED
+Additional debug info:
+Argus Error Status
+EOS on shutdown enabled -- waiting for EOS after Error
+Waiting for EOS...
+
+-------------------- log crosslink imx219 imitation - not works ------------------------
+Setting pipeline to PAUSED ...
+Pipeline is live and does not need PREROLL ...
+Setting pipeline to PLAYING ...
+New clock: GstSystemClock
+GST_ARGUS: Creating output stream
+CONSUMER: Waiting until producer is connected...
+GST_ARGUS: Available Sensor modes :
+GST_ARGUS: 3264 x 2464 FR = 21,000000 fps Duration = 47619048 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 3264 x 1848 FR = 28,000001 fps Duration = 35714284 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 1920 x 1080 FR = 29,999999 fps Duration = 33333334 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 1640 x 1232 FR = 29,999999 fps Duration = 33333334 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 1280 x 720 FR = 59,999999 fps Duration = 16666667 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: 1280 x 720 FR = 120,000005 fps Duration = 8333333 ; Analog Gain range min 1,000000, max 10,625000; Exposure Range min 13000, max 683709000;
+GST_ARGUS: Running with following settings:
+   Camera index = 0 
+   Camera mode  = 0 
+   Output Stream W = 3264 H = 2464 
+   seconds to Run    = 0 
+   Frame Rate = 21,000000 
+GST_ARGUS: Setup Complete, Starting captures for 0 seconds
+GST_ARGUS: Starting repeat capture requests.
+CONSUMER: Producer has connected; continuing.
+^C
+
+handling interrupt.
+Interrupt: Stopping pipeline ...
+EOS on shutdown enabled -- Forcing EOS on the pipeline
+Waiting for EOS...
+Got EOS from element "pipeline0".
+EOS received - stopping pipeline...
+Execution ended after 0:10:20.270086638
+Setting pipeline to PAUSED ...
+Setting pipeline to READY ...
+GST_ARGUS: Cleaning up
+CONSUMER: Done Success
+GST_ARGUS: Done Success
+Setting pipeline to NULL ...
+Freeing pipeline ...
