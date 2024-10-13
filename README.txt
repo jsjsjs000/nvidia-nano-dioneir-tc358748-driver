@@ -124,10 +124,10 @@ v4l2-compliance -d /dev/video0
 v4l2-ctl -V -d /dev/video0
 
 v4l2-ctl --stream-mmap --stream-to=file.raw --stream-count=1
-v4l2-ctl --device /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=RGBA --stream-mmap --stream-to=file.raw --stream-count=1
+v4l2-ctl -d /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=RGBA --stream-mmap --stream-count=1 --stream-to=file.raw
 
+v4l2-ctl -d /dev/video0 --set-fmt-video=width=3280,height=2464,pixelformat=AR24 --stream-mmap --stream-count=1 --stream-to=image.raw
 
-v4l2-ctl --set-fmt-video=width=3280,height=2464,pixelformat=AR24 --stream-mmap --stream-count=1 -d /dev/video0 --stream-to=image.raw
 https://github.com/xenicsir/dione_mipi_tegra/tree/main/jetpack
 
 --------------------------------------------
