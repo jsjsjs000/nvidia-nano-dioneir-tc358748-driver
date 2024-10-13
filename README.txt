@@ -62,7 +62,10 @@ mkdir -p $backup/patch/
 cp ~/l4t-gcc/Linux_for_Tegra/source/public/kernel/kernel-4.9/0001-regmap-add-formats.patch $backup/patch/
 
 # -------------------- Apply patch --------------------
-$$$
+cd kernel/kernel-4.9/
+cp $backup/patch/0001-regmap-add-formats.patch .
+git apply 0001-regmap-add-formats.patch
+cd -
 
 # -------------------- Compile --------------------
 c; l4tm modules && scp build/drivers/media/i2c/dione.ko root@192.168.3.12:/lib/modules/4.9.253-tegra/kernel/drivers/media/i2c/
